@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>選手情報</h2>
+<form method="POST">
+<input type="hidden" name="user_id" value="{{ current_user.id }}">
+<p>
+<label for="uniform_number">背番号</label>
+<input type="number" name="uniform_number" size="3" required><br>
+
+<label for="player">名前</label>
+<input type="text" name="player" size="15" required><br>
+
+<button type="submit">追加</button>
+</p>
+</form>
+<div id="teams-container"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    updatePlayerName();
+});
+
+function updatePlayerName() {
+    fetch('/api/players') // 選手の成績データを取得するAPI
+        .then(response => response.json())
+        .then(data => {
+            var teamsContainer = document.getElementById('teams-container');
+            teamsContainer.innerHTML = ''; // 既存の内容をクリア
+            if (data.length > 0) {
+                var playerInfo = '';
+                data.forEach(function(player) {
+                    // 選手の背番号と選手名を取得
+                    var playerNumber = player.number;
+                    var playerName = player.name;
+                    var playerId = player.id; // 選手のIDを取得
+                    // 選手情報に削除リンクを追加
+                    playerInfo += `${playerNumber}&nbsp;&nbsp;${playerName}&nbsp;&nbsp;&nbsp;<a href="/${playerId}/player_delete" role="button">削除</a><br>`;
+                });
+                teamsContainer.innerHTML = playerInfo;
+            } else {
+                teamsContainer.innerHTML = '登録されている選手がいません';
+            }
+        });
+}
+
+</script>
+{% endblock %}

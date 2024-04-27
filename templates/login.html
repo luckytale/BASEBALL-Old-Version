@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>ログイン</h2>
+<form method="POST">
+    <label for="">ユーザー名</label>
+    <input type="text" name="username"><br>
+    <label for="">パスワード</label>
+    <input type="password" name="password"><br>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <p class="alert alert-{{ category }}">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <p><input type="submit" value="ログイン"></p>
+</form> 
+初めて利用する方は<a href="/signup" role="button">こちら</a>
+{% endblock %}

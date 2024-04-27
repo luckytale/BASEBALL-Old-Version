@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>新規登録</h2>
+<form method="POST">
+    <label for="">ユーザー名</label>
+    <input type="text" name="username"><br>
+    <label for="">パスワード</label>
+    <input type="password" name="password"><br>
+    <p class="alert"><strong>※ユーザー名とパスワードは必ず控えてください。</strong></p>
+    <p><input type="submit" value="新規登録"></p>
+</form> 
+{% endblock %}

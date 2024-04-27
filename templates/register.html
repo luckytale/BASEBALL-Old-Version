@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>打席登録</h2>
+<!-- ストライクゾーン -->
+<div class="grid-container">
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item strike"></button>
+    <button class="grid-item strike"></button>
+    <button class="grid-item strike"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item strike"></button>
+    <button class="grid-item strike"></button>
+    <button class="grid-item strike"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item strike"></button>
+    <button class="grid-item strike"></button>
+    <button class="grid-item strike"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+    <button class="grid-item ball"></button>
+</div>
+
+<!-- ポップアップコンテンツ -->
+<div id="myModal" class="modal">
+    <!-- モーダルコンテンツ -->
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <form method="POST">
+            <input type="hidden" name="user_id" value="{{ current_user.id }}">
+            <label for="matchnumber">試合番号</label>
+            <input type="text" name="matchnumber" id="matchnumber" size="3" value="{{ default_match_number }}"><br>
+            <div class="selectedButtonNumber"></div>
+            <label for="playerNumber">背番号</label>
+            <input type="number" id="playerNumber" name="BatterNumber" size="1" required><br>
+            <label for="playerName">打者</label>
+            <input type="text" id="playerName" name="BatterName" size="10" required><br>            
+            投手
+            <label><input type="radio" name="hand" value="右投" checked> 右投</label>
+            <label><input type="radio" name="hand" value="左投"> 左投</label><br>
+            球種
+            <select id="type-filter" name="PitchType">           
+                <option></option>
+                <option value="ストレート">ストレート</option>
+                <option value="変化球">変化球</option>
+            </select><br>
+            結果
+            <select name="place">
+                <option value=""></option>
+                <option value="投">投</option>
+                <option value="捕">捕</option>
+                <option value="一">一</option>
+                <option value="二">二</option>
+                <option value="三">三</option>
+                <option value="遊">遊</option>
+                <option value="左">左</option>
+                <option value="中">中</option>
+                <option value="右">右</option>
+            </select>
+            <select name="Result" required>           
+                <option></option>
+                <option>ゴロ</option>
+                <option value="飛">フライ</option>
+                <option value="直">ライナー</option>
+                <option>空三振</option>
+                <option>見三振</option>
+                <option>四球</option>
+                <option>死球</option>
+                <option>安打</option>
+                <option>二塁打</option>
+                <option>三塁打</option>
+                <option>本塁打</option>
+                <option>犠打</option>
+                <option>犠飛</option>
+                <option value="失">エラー</option>
+                <option>打撃妨害</option>
+                <option>走塁妨害</option>
+            </select><br>
+            打点
+            <select name="RBI">
+                <option>0</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+            </select><br>
+            打球方向<br>
+            <div id="image-container">
+                <img src="{{url_for('static', filename='images/ground.jpg')}}" alt="野球グラウンド" width="350" height="335">
+            </div>
+            <!-- フォーム内 -->
+            <input type="hidden" name="course" value="">
+            <input type="hidden" name="x" value="">
+            <input type="hidden" name="y" value="">
+            <button class="BattingResult" type="submit">決定</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.grid-item').forEach(function(button, index) {
+        button.addEventListener('click', function() {
+            // ポップアップを表示
+            document.getElementById('myModal').style.display = 'block';
+            // 押されたボタンの位置を表示
+            document.querySelectorAll('.selectedButtonNumber').forEach(function(element){
+                element.style.display = 'none';
+            });
+            // コースの値を隠れたフォームフィールドに設定
+            document.querySelector('input[name="course"]').value = index + 1;        
+        });
+    });
+
+    // モーダルの閉じるボタンにイベントリスナーを追加
+    document.querySelector(".close").addEventListener("click", function() {
+        document.getElementById("myModal").style.display = "none";
+    });
+
+    // 打球方向
+    const imageContainer = document.getElementById('image-container');
+
+    // 画像コンテナがクリックされた時
+    imageContainer.addEventListener('click', function(event) {
+        // クリックされた要素がマーカーである場合、それを削除
+        if (event.target.classList.contains('marker')) {
+            event.target.remove();
+            return; // ここで処理を終了
+        }
+
+        // クリックされた位置を取得（画像コンテナ内の相対座標）
+        const x = event.offsetX;
+        const y = event.offsetY;
+
+        // クリックされた位置を隠れたフォームフィールドに設定
+        document.querySelector('input[name="x"]').value = x;
+        document.querySelector('input[name="y"]').value = y;        
+            createMarker(x, y);
+        });
+
+    // マーカーを作成し、画像コンテナに追加する関数
+    function createMarker(x, y) {
+        const marker = document.createElement('div');
+        marker.classList.add('marker');
+        marker.style.left = `${x}px`;
+        marker.style.top = `${y}px`;
+
+        // マーカーを画像コンテナに追加
+        imageContainer.appendChild(marker);
+    }
+
+    // playerDataの取得
+    fetch("/api/players")
+        .then(response => response.json())
+        .then(playerData => {
+            // 背番号フィールドの値が変更されたときのイベントリスナーを設定
+            document.getElementById("playerNumber").addEventListener("input", function() {
+                // 入力されたチーム名と背番号を取得
+                const playerNumber = parseInt(document.getElementById("playerNumber").value);
+                // 対応する選手を検索
+                const player = playerData.find(p => p.number === playerNumber);
+
+                // 選手名フィールドを更新
+                if (player) {
+                    document.getElementById("playerName").value = player.name;
+                } else {
+                    document.getElementById("playerName").value = "該当者なし"; // 該当する選手がいない場合はクリア
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching player data:', error));
+
+</script>
+{% endblock %}

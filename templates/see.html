@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>打席履歴</h2>
+{% if bats %}
+試合番号&emsp;打者名&emsp;&emsp;&nbsp;結果
+    {% for bat in bats %}
+        <p>
+            &emsp;{{bat.matchnumber}}
+            &emsp;&emsp;{{bat.BatterName}}
+            &emsp;{{bat.place}}{{bat.Result}}
+            &emsp;&emsp;<a href="/{{bat.id}}/update" role="button">編集</a>
+            <a href="/{{bat.id}}/delete" role="button">※削除</a>
+        </p>
+    {% endfor %}
+{% else %}
+    <p>打席履歴がありません</p>
+{% endif %}
+{% endblock %}

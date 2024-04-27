@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+</head>
+
+<body>
+<form method="POST">
+    <label for="matchnumber">試合番号</label>
+    <input type="text" name="matchnumber" id="matchnumber" size="3" value="{{bat.matchnumber}}"><br>
+    <div class="selectedButtonNumber"></div>
+    <label for="team">チーム</label>
+    <input type="text" id="team" name="BatterTeam" size="10" value="{{bat.BatterTeam}}"><br>
+    <label for="playerName">打者</label>
+    <input type="text" id="playerName" name="BatterName" size="10" value="{{bat.BatterName}}" required><br>            
+    投手
+    <label><input type="radio" name="hand" value="右投"{% if bat.hand == "右投" %}checked{% endif %}> 右投</label>
+    <label><input type="radio" name="hand" value="左投"{% if bat.hand == "左投" %}checked{% endif %}> 左投</label><br>
+    <label for="">球速</label>
+    <input type="text" name="speed" size="5" value="{{bat.speed}}">km/h<br>
+    球種
+    <select id="type-filter" name="PitchType">           
+        <option></option>
+        <option value="ストレート"{% if bat.PitchType == "ストレート" %}selected{% endif %}>ストレート</option>
+        <option value="変化球"{% if bat.PitchType == "変化球" %}selected{% endif %}>変化球</option>
+    </select><br>
+    結果
+    <select name="place">
+        <option value=""{% if bat.place == "" %} selected{% endif %}></option>
+        <option value="投"{% if bat.place == "投" %} selected{% endif %}>投</option>
+        <option value="捕"{% if bat.place == "捕" %} selected{% endif %}>捕</option>
+        <option value="一"{% if bat.place == "一" %} selected{% endif %}>一</option>
+        <option value="二"{% if bat.place == "二" %} selected{% endif %}>二</option>
+        <option value="三"{% if bat.place == "三" %} selected{% endif %}>三</option>
+        <option value="遊"{% if bat.place == "遊" %} selected{% endif %}>遊</option>
+        <option value="左"{% if bat.place == "左" %} selected{% endif %}>左</option>
+        <option value="中"{% if bat.place == "中" %} selected{% endif %}>中</option>
+        <option value="右"{% if bat.place == "右" %} selected{% endif %}>右</option>
+    </select>
+    <select name="Result" required>           
+        <option value=""></option>
+        <option value="ゴロ"{% if bat.Result == "ゴロ" %} selected{% endif %}>ゴロ</option>
+        <option value="飛"{% if bat.Result == "飛" %} selected{% endif %}>フライ</option>
+        <option value="直"{% if bat.Result == "直" %} selected{% endif %}>ライナー</option>
+        <option value="空三振"{% if bat.Result == "空三振" %} selected{% endif %}>空三振</option>
+        <option value="見三振"{% if bat.Result == "見三振" %} selected{% endif %}>見三振</option>
+        <option value="四球"{% if bat.Result == "四球" %} selected{% endif %}>四球</option>
+        <option value="死球"{% if bat.Result == "死球" %} selected{% endif %}>死球</option>
+        <option value="安打"{% if bat.Result == "安打" %} selected{% endif %}>安打</option>
+        <option value="二塁打"{% if bat.Result == "二塁打" %} selected{% endif %}>二塁打</option>
+        <option value="三塁打"{% if bat.Result == "三塁打" %} selected{% endif %}>三塁打</option>
+        <option value="本塁打"{% if bat.Result == "本塁打" %} selected{% endif %}>本塁打</option>
+        <option value="犠打"{% if bat.Result == "犠打" %} selected{% endif %}>犠打</option>
+        <option value="犠飛"{% if bat.Result == "犠飛" %} selected{% endif %}>犠飛</option>
+        <option value="失"{% if bat.Result == "失" %} selected{% endif %}>エラー</option>
+        <option value="打撃妨害"{% if bat.Result == "打撃妨害" %} selected{% endif %}>打撃妨害</option>
+        <option value="走塁妨害"{% if bat.Result == "走塁妨害" %} selected{% endif %}>走塁妨害</option>
+    </select><br>
+    打点
+        <select name="RBI">
+            <option value="0"{% if bat.RBI == 0 %} selected{% endif %}>0</option>
+            <option value="1"{% if bat.RBI == 1 %} selected{% endif %}>1</option>
+            <option value="2"{% if bat.RBI == 2 %} selected{% endif %}>2</option>
+            <option value="3"{% if bat.RBI == 3 %} selected{% endif %}>3</option>
+            <option value="4"{% if bat.RBI == 4 %} selected{% endif %}>4</option>
+        </select><br>
+    <!-- フォーム内 -->
+    <input type="hidden" name="user_id" value="{{bat.user_id}}">
+    <input type="hidden" name="course" value="{{bat.course}}">
+    <input type="hidden" name="x" value="{{bat.x}}">
+    <input type="hidden" name="y" value="{{bat.y}}">
+    <p>
+    <button class="BattingResult" type="submit">決定</button>
+    </p>
+</form>
+</body>

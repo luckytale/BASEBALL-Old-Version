@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>試合情報</h2>
+<form method="POST">
+    <input type="hidden" name="user_id" value="{{ current_user.id }}">
+    
+    <label for="">試合番号</label>
+    <input type="number" name="match_number" size="5" required><br>
+    日付
+    <input type="date" name="date" value="{{ current_date }}"><br>
+    <select name="matchType">
+        <option>OP戦</option>
+        <option>公式戦</option>
+    </select>
+    <label for="">vs</label>
+    <input type="text" name="opponent" size="15"><br>
+    <p>
+        <button class="BattingResult" type="submit">登録</button>
+    </p>
+</form>
+{% if matches %}
+    {% for match in matches %}
+        {{ match.match_number }}.
+        {{ match.date }}
+        {{ match.matchType }}
+        {{ match.opponent }}
+        <a href="/{{match.id}}/match_update" role="button">編集</a>
+        <a href="/{{match.id}}/match_delete" role="button">削除</a>
+        <br>
+    {% endfor %}
+{% else %}
+    <p>試合情報がありません</p>
+{% endif %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var dateInput = document.querySelector('input[name="date"]');
+        var today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD形式
+        dateInput.value = today;
+    });
+</script>
+{% endblock %}

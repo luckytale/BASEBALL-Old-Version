@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<form method="POST">
+    試合番号
+    <input type="number" name="id" value="{{match.id}}"><br>
+    日付
+    <input type="date" name="date" value="{{match.date}}"><br>
+    <select name="matchType">
+        <option value="OP戦"{% if match.MatchType == "OP戦" %}selected{% endif %}>OP戦</option>
+        <option value="公式戦"{% if match.MatchType == "公式戦" %}selected{% endif %}>公式戦</option>
+    </select>
+    <label for="">vs</label>
+    <input type="text" name="opponent" size="15" value="{{match.opponent}}"><br>
+    <p>
+        <button class="BattingResult" type="submit">登録</button>
+    </p>
+</form>
+{% endblock %}

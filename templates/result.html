@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>打撃成績</h2>
+<p>
+<select id="player-select">
+    <option value=""></option>
+    {% for player in players %}
+    <option value="{{ player.BatterName }}">{{ player.BatterName }}</option>
+    {% endfor %}
+</select>
+<!-- 結果によるフィルタリング用のドロップダウン -->
+<select id="hand-filter">
+    <option value="">全て</option>
+    <option value="右投">右投</option>
+    <option value="左投">左投</option>
+</select>
+
+<select id="type-filter">
+    <option value="">全て</option>
+    <option value="ストレート">ストレート</option>
+    <option value="変化球">変化球</option>
+</select>
+</p>
+<div id="stats-container"></div>
+
+<p>打球方向
+<select id="result-filter">
+    <option value="">全て</option>
+    <option value="安打">安打</option>
+    <option value="アウト">アウト</option>
+</select>
+</p>
+<div class="center">
+    <p>
+        <div id="image-container">
+            <img src="{{url_for('static', filename='images/ground.jpg')}}" alt="野球グラウンド" width="350" height="335">
+        </div>
+    </p>
+    <p>
+        <div class="circle single"></div>安打
+        <div class="circle extra-base"></div>長打
+        <div class="circle home-run"></div>本塁打
+        <div class="circle out"></div>アウト
+        <div class="circle bunt"></div>犠打
+    </p>
+    <p>
+        <div id="stats-course-container"></div>
+
+    <div class="aaaaa">
+        <div id="ave7" class="rectangle"></div>
+        <div id="ave8" class="rectangle"></div>
+        <div id="ave9" class="rectangle"></div>
+        <div id="ave12" class="rectangle"></div>
+        <div id="ave13" class="rectangle"></div>
+        <div id="ave14" class="rectangle"></div>
+        <div id="ave17" class="rectangle"></div>
+        <div id="ave18" class="rectangle"></div>
+        <div id="ave19" class="rectangle"></div>
+    </div>
+    <p>
+</div>
+<div id="results">
+    {% if grouped_results %}
+    {% for (key, records) in grouped_results %}
+    <div class="result-group">
+        <strong>{{ key[0] }} {{ key[1] }} {{ key[2] }}</strong>
+        <div class="result-content">
+            {% for bat, match in records -%}
+            <span class="result-item" data-batter-name="{{ bat.BatterName }}">{{ bat.place }}{{ bat.Result }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>試合情報がありません</p>
+    {% endif %}
+</div>
+</p>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var results = document.querySelectorAll('.result-item');
+        results.forEach(function(result) {
+            var resultText = result.textContent;
+            if (resultText.includes('安打') || resultText.includes('二塁打') || resultText.includes('三塁打') || resultText.includes('本塁打')) {
+                result.classList.add('safe');
+            }
+        });
+    });
+
+    // Pythonから渡されたJSONデータをJavaScriptオブジェクトに変換
+    var bats = JSON.parse('{{ bats | safe }}');
+
+    // 最初にすべての結果を非表示にする
+    window.addEventListener('DOMContentLoaded', function() {
+        const resultGroups = document.querySelectorAll('.result-group');
+        resultGroups.forEach(function(group) {
+            group.style.display = 'none';
+        });
+    });       
+    
+    document.getElementById('player-select').addEventListener('change', function() {
+        updateStatsDisplay();
+        const selectedBatter = this.value; 
+        // すべての結果グループを取得
+        const resultGroups = document.querySelectorAll('.result-group');
+        
+        // すべてのアイテムを一度表示
+        resultGroups.forEach(function(group) {
+            group.style.display = 'block';
+            const items = group.querySelectorAll('.result-item');
+            items.forEach(function(item) {
+                item.style.display = 'block';
+            });
+        });
+        
+        // 結果グループごとに処理を行う
+        resultGroups.forEach(function(group) {
+            // グループ内のデータバッターネームを取得
+            const items = group.querySelectorAll('.result-item');
+            let foundMatchingItem = false;
+
+            // 各アイテムをチェックして、選択されたバッター名と一致するか確認
+            items.forEach(function(item) {
+                const batterName = item.getAttribute('data-batter-name');
+                if (batterName === selectedBatter) {
+                    foundMatchingItem = true;
+                } else {
+                    // 一致しないアイテムを非表示にする
+                    item.style.display = 'none';
+                }
+            });
+
+            // 一致するアイテムが見つかったかどうかで表示/非表示を決定
+            if (!foundMatchingItem) {
+                group.style.display = 'none';
+            }
+        });
+    });    
+        
+    // 利き手フィルターの変更イベント
+    document.getElementById('hand-filter').addEventListener('change', function() {
+        updateStatsDisplay();
+    });
+    
+    // 変化球フィルターの変更イベント
+    document.getElementById('type-filter').addEventListener('change', function() {
+        updateStatsDisplay();
+    });
+
+    // 結果フィルターの変更イベント
+    document.getElementById('result-filter').addEventListener('change', function() {
+        updateStatsDisplay();
+    });
+    
+    function updateStatsDisplay() {
+        var playerName = document.getElementById('player-select').value;
+        var handFilter = document.getElementById('hand-filter').value;
+        var typeFilter = document.getElementById('type-filter').value;
+        var resultFilter = document.getElementById('result-filter').value;
+
+        fetch('/api/player-stats?name=' + playerName) // 選手の成績データを取得するAPI
+            .then(response => response.json())
+            .then(data => {
+                // すべてのフィルタリングを一度に実行
+                var filteredData = data.filter(function(stat) {
+                    var handCondition = handFilter === "" || stat.hand === handFilter;
+                    var typeCondition = typeFilter === "" || stat.PitchType === typeFilter;
+                    if (typeFilter === "ストレート") {
+                    typeCondition = stat.PitchType === "ストレート";
+                } else if (typeFilter === "変化球") {
+                    typeCondition = stat.PitchType !== "ストレート" && stat.PitchType !== "";
+                }                        
+                    return handCondition && typeCondition;
+                });
+    
+                var statsContainer = document.getElementById('stats-container');
+                statsContainer.innerHTML = ''; // 既存の内容をクリア
+
+                var statscourseContainer = document.getElementById('stats-course-container');
+                // 既存の統計情報をクリア
+                statscourseContainer.innerHTML = '';
+
+                var imageContainer = document.getElementById('image-container');
+                // 既存のマーカーをクリア
+                while(imageContainer.children.length > 1) {
+                    imageContainer.removeChild(imageContainer.lastChild);
+                }
+                
+                var resultfilteredData = filteredData.filter(function(stat){
+                    var resultCondition = resultFilter === "" || stat.Result === resultFilter;
+                    if (resultFilter === "安打") {
+                        // resultFilter が「安打」の場合
+                        resultCondition = ["安打", "二塁打", "三塁打", "本塁打"].includes(stat.Result);
+                    } else if (resultFilter === "アウト") {
+                        // resultFilter が「アウト」の場合
+                        resultCondition = stat.Result !== "安打" && stat.Result !== "二塁打" && stat.Result !== "三塁打" && stat.Result !== "本塁打" && stat.Result !== "";
+                    } else {
+                        // 他の値の場合
+                        resultCondition = resultFilter === "" || stat.Result === resultFilter;
+                    }                    
+                    return resultCondition;
+                })
+
+                resultfilteredData.forEach(function(stat) {
+                    if (stat.x !== null && stat.y !== null) {
+                        // マーカーを作成
+                        var marker = document.createElement('div');
+                        marker.style.position = 'absolute';
+                        marker.style.left = `${stat.x}px`; // x座標をピクセルで指定
+                        marker.style.top = `${stat.y}px`; // y座標をピクセルで指定
+                        marker.style.width = '10px'; // マーカーのサイズ
+                        marker.style.height = '10px';
+                        marker.style.borderRadius = '50%'; // 円形にする
+                        marker.style.transform = 'translate(-50%, -50%)'; // 中心を座標に合わせる
+                        // 打席結果ごとのマーカーの色
+                        if (stat.Result == '安打') {
+                            marker.style.backgroundColor = 'blue'; 
+                        } else if (stat.Result == '二塁打' || stat.Result == '三塁打') {
+                            marker.style.backgroundColor = 'aqua'; 
+                        } else if (stat.Result == '本塁打') {
+                            marker.style.backgroundColor = 'lime'; 
+                        } else if (stat.Result == 'ゴロ' || stat.Result == 'フライ' || stat.Result == 'ライナー' || stat.Result == '飛' || stat.Result == '直'
+                                || stat.Result == '犠飛' || stat.Result == 'エラー' || stat.Result == '失') {
+                            marker.style.backgroundColor = 'red'; 
+                        } else if (stat.Result == '犠打') {
+                            marker.style.backgroundColor = 'yellow'; 
+                        }
+                        // マーカーを画像コンテナに追加
+                        imageContainer.appendChild(marker);
+                    }
+                });
+
+        // filteredDataを利用して統計情報を集計
+        if (filteredData.length > 0) {
+            // 統計情報の計算
+            var hitTypes = ['安打', '二塁打', '三塁打', '本塁打'];
+            var excludeTypes = ['四球','死球','犠打','犠飛']
+            var hits = filteredData.filter(stat => hitTypes.includes(stat.Result)).length;
+            var doubles = filteredData.filter(stat => stat.Result === '二塁打').length;
+            var triples = filteredData.filter(stat => stat.Result === '三塁打').length;
+            var homeRuns = filteredData.filter(stat => stat.Result === '本塁打').length;
+            var walks = filteredData.filter(stat => stat.Result === '四球').length;
+            var deadBalls = filteredData.filter(stat => stat.Result === '死球').length;
+            var bunts = filteredData.filter(stat => stat.Result === '犠打').length;
+            var sacrificeFlies = filteredData.filter(stat => stat.Result === '犠飛').length;
+            var all = filteredData.length
+            var atBats = filteredData.length - walks - deadBalls - bunts - sacrificeFlies;
+            var totalBases = hits + doubles + (triples * 2) + (homeRuns * 3);
+            var battingAverage = atBats > 0 ? ((hits / atBats) >= 1 ? "1.000" : (hits / atBats).toFixed(3).substring(1)) : "-";
+            var onBasePercentage = (hits + walks + deadBalls) / (atBats + walks + deadBalls + sacrificeFlies);
+            onBasePercentage = isFinite(onBasePercentage) ? (onBasePercentage >= 1 ? "1.000" : onBasePercentage.toFixed(3).substring(1)) : ".000";
+            var sluggingPercentage = atBats > 0 ? (totalBases / atBats).toFixed(3) : ".000";
+            sluggingPercentage = parseFloat(sluggingPercentage) >= 1 ? sluggingPercentage : sluggingPercentage.substring(1);
+            var ops = (parseFloat(onBasePercentage) + parseFloat(sluggingPercentage)).toFixed(3);
+            var totalRBI = filteredData.reduce((total, stat) => {
+                // RBIの値を数値に変換します。不正な値は0として扱います。
+                const rbiValue = parseInt(stat.RBI, 10) || 0;
+                // 合計値に変換したRBIを加算します。
+                return total + rbiValue;
+                }, 0); // 初期値として0を設定します。
+
+            // コースごとの打率
+            var exclude7 = filteredData.filter(stat => excludeTypes.includes(stat.Result) && stat.course == 7).length;
+            var exclude8 = filteredData.filter(stat => excludeTypes.includes(stat.Result) && stat.course == 8).length;
+            var exclude9 = filteredData.filter(stat => excludeTypes.includes(stat.Result) && stat.course == 9).length;
+            var exclude12 = filteredData.filter(stat => excludeTypes.includes(stat.Result) && stat.course == 12).length;
+            var exclude13 = filteredData.filter(stat => excludeTypes.includes(stat.Result) && stat.course == 13).length;
+            var exclude14 = filteredData.filter(stat => excludeTypes.includes(stat.Result) && stat.course == 14).length;
+            var exclude17 = filteredData.filter(stat => excludeTypes.includes(stat.Result) && stat.course == 17).length;
+            var exclude18 = filteredData.filter(stat => excludeTypes.includes(stat.Result) && stat.course == 18).length;
+            var exclude19 = filteredData.filter(stat => excludeTypes.includes(stat.Result) && stat.course == 19).length;
+            var hits7 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 7).length;
+            var hits8 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 8).length;
+            var hits9 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 9).length;
+            var hits12 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 12).length;
+            var hits13 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 13).length;
+            var hits14 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 14).length;
+            var hits17 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 17).length;
+            var hits18 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 18).length;
+            var hits19 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 19).length;
+            var atBats7 = filteredData.filter(stat => stat.course == 7).length - exclude7;
+            var atBats8 = filteredData.filter(stat => stat.course == 8).length - exclude7;
+            var atBats9 = filteredData.filter(stat => stat.course == 9).length - exclude7;
+            var atBats12 = filteredData.filter(stat => stat.course == 12).length - exclude7;
+            var atBats13 = filteredData.filter(stat => stat.course == 13).length - exclude7;
+            var atBats14 = filteredData.filter(stat => stat.course == 14).length - exclude7;
+            var atBats17 = filteredData.filter(stat => stat.course == 17).length - exclude7;
+            var atBats18 = filteredData.filter(stat => stat.course == 18).length - exclude7;
+            var atBats19 = filteredData.filter(stat => stat.course == 19).length - exclude7;
+
+            var battingAverage7 = atBats7 > 0 ? (hits7 / atBats7).toFixed(3) : "-";
+            var battingAverage7 = battingAverage7 === "1.000" ? "1.000" : battingAverage7.startsWith("1.") ? battingAverage7 : battingAverage7.substring(1);
+
+            var battingAverage8 = atBats8 > 0 ? (hits8 / atBats8).toFixed(3) : "-";
+            battingAverage8 = battingAverage8 === "1.000" ? "1.000" : battingAverage8.startsWith("1.") ? battingAverage8 : battingAverage8.substring(1);
+
+            var battingAverage9 = atBats9 > 0 ? (hits9 / atBats9).toFixed(3) : "-";
+            battingAverage9 = battingAverage9 === "1.000" ? "1.000" : battingAverage9.startsWith("1.") ? battingAverage9 : battingAverage9.substring(1);
+
+            var battingAverage12 = atBats12 > 0 ? (hits12 / atBats12).toFixed(3) : "-";
+            battingAverage12 = battingAverage12 === "1.000" ? "1.000" : battingAverage12.startsWith("1.") ? battingAverage12 : battingAverage12.substring(1);
+
+            var battingAverage13 = atBats13 > 0 ? (hits13 / atBats13).toFixed(3) : "-";
+            battingAverage13 = battingAverage13 === "1.000" ? "1.000" : battingAverage13.startsWith("1.") ? battingAverage13 : battingAverage13.substring(1);
+
+            var battingAverage14 = atBats14 > 0 ? (hits14 / atBats14).toFixed(3) : "-";
+            battingAverage14 = battingAverage14 === "1.000" ? "1.000" : battingAverage14.startsWith("1.") ? battingAverage14 : battingAverage14.substring(1);
+
+            var battingAverage17 = atBats17 > 0 ? (hits17 / atBats17).toFixed(3) : "-";
+            battingAverage17 = battingAverage17 === "1.000" ? "1.000" : battingAverage17.startsWith("1.") ? battingAverage17 : battingAverage17.substring(1);
+
+            var battingAverage18 = atBats18 > 0 ? (hits18 / atBats18).toFixed(3) : "-";
+            battingAverage18 = battingAverage18 === "1.000" ? "1.000" : battingAverage18.startsWith("1.") ? battingAverage18 : battingAverage18.substring(1);
+
+            var battingAverage19 = atBats19 > 0 ? (hits19 / atBats19).toFixed(3) : "-";
+            battingAverage19 = battingAverage19 === "1.000" ? "1.000" : battingAverage19.startsWith("1.") ? battingAverage19 : battingAverage19.substring(1);
+            
+            // 統計情報の表示更新
+            statsContainer.innerHTML = `打席数: ${all}
+                                        打数: ${atBats}
+                                        安打: ${hits}
+                                        打率: ${battingAverage} <br>
+                                        出塁率: ${onBasePercentage}
+                                        長打率: ${sluggingPercentage}
+                                        OPS: ${ops}<br>
+                                        二塁打: ${doubles}
+                                        三塁打: ${triples}
+                                        本塁打: ${homeRuns}
+                                        打点： ${totalRBI}<br>
+                                        四球: ${walks}
+                                        死球: ${deadBalls}
+                                        犠打: ${bunts}
+                                        犠飛: ${sacrificeFlies}`;
+
+            ave7.innerHTML = `${atBats7}-${hits7}<br>${battingAverage7}`;
+            ave8.innerHTML = `${atBats8}-${hits8}<br>${battingAverage8}`;
+            ave9.innerHTML = `${atBats9}-${hits9}<br>${battingAverage9}`;
+            ave12.innerHTML = `${atBats12}-${hits12}<br>${battingAverage12}`;
+            ave13.innerHTML = `${atBats13}-${hits13}<br>${battingAverage13}`;
+            ave14.innerHTML = `${atBats14}-${hits14}<br>${battingAverage14}`;
+            ave17.innerHTML = `${atBats17}-${hits17}<br>${battingAverage17}`;
+            ave18.innerHTML = `${atBats18}-${hits18}<br>${battingAverage18}`;
+            ave19.innerHTML = `${atBats19}-${hits19}<br>${battingAverage19}`;
+
+            function updateBattingClass(battingAverage, element) {
+            // battingAverageが"-"の場合、どちらのクラスも削除して早期リターン
+            if (battingAverage === "-") {
+                element.classList.remove('high');
+                element.classList.remove('low');
+                return; // これ以上の処理は行わない
+            }
+
+            // 文字列を数値に変換
+            const numericAverage = parseFloat(battingAverage);
+
+            if (numericAverage > 0.3) {
+                element.classList.add('high');
+                element.classList.remove('low');
+            } else if (numericAverage < 0.2) {
+                element.classList.add('low');
+                element.classList.remove('high');
+            } else {
+                // 打率が0.2以上0.3以下の場合、特にどちらのクラスも削除する
+                element.classList.remove('high');
+                element.classList.remove('low');
+            }
+        }
+            // それぞれの打率と要素に対して関数を呼び出す
+            updateBattingClass(battingAverage7, document.getElementById('ave7'));
+            updateBattingClass(battingAverage8, document.getElementById('ave8'));
+            updateBattingClass(battingAverage9, document.getElementById('ave9'));
+            updateBattingClass(battingAverage12, document.getElementById('ave12'));
+            updateBattingClass(battingAverage13, document.getElementById('ave13'));
+            updateBattingClass(battingAverage14, document.getElementById('ave14'));
+            updateBattingClass(battingAverage17, document.getElementById('ave17'));
+            updateBattingClass(battingAverage18, document.getElementById('ave18'));
+            updateBattingClass(battingAverage19, document.getElementById('ave19'));
+
+
+        } else {
+            statsContainer.innerHTML = '該当するデータがありません。';
+            ave7.innerHTML = '-';          
+            ave8.innerHTML = '-';            
+            ave9.innerHTML = '-';   
+            ave12.innerHTML = '-';
+            ave13.innerHTML = '-';
+            ave14.innerHTML = '-';
+            ave17.innerHTML = '-';
+            ave18.innerHTML = '-';
+            ave19.innerHTML = '-';
+        }
+                    });
+            }    
+
+</script>
+{% endblock %}

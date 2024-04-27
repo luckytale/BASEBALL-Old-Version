@@ -1,0 +1,176 @@
+.container{
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ストライクゾーン */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(5, 40px); /* 横幅を100pxに設定 */
+    grid-template-rows: repeat(5, 50px); /* 縦の高さを200pxに設定 */
+    grid-gap: 0px; /* グリッドアイテム間の隙間をなくす */
+    padding: 20px; /* コンテナのパディングを0に設定 */
+    }
+   
+
+.grid-item {
+    width: 100%; /* セルの幅全体を使用 */
+    height: 100%; /* セルの高さ全体を使用、または具体的な値を設定して縦長に */
+    padding: 20px 0; /* 上下にパディングを適用し、左右は0に */
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0; /* 外側の余白をなくす */
+  }
+  
+  .ball{
+    background-color: rgba(58, 58, 58, 0.692);
+  }
+
+  .strike{
+    background-color: rgb(212, 212, 212);
+  }
+
+  /* モーダルのスタイル */
+  .modal {
+    display: none; /* デフォルトでは非表示 */
+    position: fixed; /* 画面上に固定 */
+    z-index: 1; /* コンテンツの上に表示 */
+    left: 0;
+    top: 0;
+    width: 100%; /* 幅を画面全体に */
+    height: 100%; /* 高さを画面全体に */
+    overflow: auto; /* 外側のコンテンツがスクロール可能 */
+    background-color: rgb(0,0,0); /* 背景色 */
+    background-color: rgba(0,0,0,0.4); /* 背景色（暗め） */
+  }
+  
+  /* モーダルのコンテンツスタイル */
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 上下のマージンと自動横マージン */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* 幅 */
+  }
+  
+  /* 閉じるボタンのスタイル */
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+/* 打球方向 */
+#baseball-field {
+    cursor: crosshair;
+  }
+  
+#image-container {
+    position: relative;
+    display: inline-block;
+    }
+  
+.marker {
+    position: absolute;
+    width: 15px; /* 円のサイズ */
+    height: 15px; /* 円のサイズ */
+    background-color: red; /* 円の色 */
+    border-radius: 50%; /* 円形にする */
+    transform: translate(-50%, -50%); /* 円の中心をクリックした位置に合わせる */
+    cursor: pointer;
+    }
+    
+.rectangle {
+  width: 60px; /* 幅 */
+  height: 80px; /* 高さ */
+  border: 2px solid #000000; /* 枠線 */
+  display: flex;
+}
+
+.aaaaa {
+  display: grid;
+  grid-template-columns: repeat(3, 60px); /* 3列にする */
+  grid-gap: 0px; /* グリッド間のギャップ */
+  width: 180px; /* コンテナの幅 */
+  margin: 70px;
+}
+
+/* コース別打率 */
+.high {background-color: red;}
+.low {background-color: blue;}
+
+/* 打席結果別色分け */
+.circle {
+  border-radius: 50%;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  line-height: 10px;
+  margin: 2px;
+}
+
+.single {background-color: blue; /* 安打の色 */}
+.extra-base {  background-color: aqua; /* 長打の色 */}
+.home-run {  background-color: lime; /* 本塁打の色 */}
+.out {  background-color: red; /* アウトの色 */}
+.bunt {  background-color: yellow; /* 犠打の色 */}
+
+/* 横並びに表示するために結果アイテムの親要素にスタイルを設定 */
+.result-content {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 5px; /* アイテム間の余白を設定（任意） */
+}
+.result-item {
+  margin: 0;
+  padding: 0;
+}
+
+.result-item.safe {
+  color: red;
+  font-weight: bold;
+}
+
+nav {
+  width: 100%;
+  height: 50px;
+  background-color: dimgray;
+  padding-top: 0px;
+  box-sizing: border-box;
+}
+
+ul {
+  display: flex;
+  justify-content: space-between; /* リンクを等間隔で配置 */
+  padding: 0; /* リストの余白をリセット */
+}
+
+li {
+  list-style: none;
+  flex-grow: 1; /* ボタンを等間隔に配置 */
+  text-align: center; /* テキストを中央揃え */
+  display: flex; /* テキストを上下中央に配置するために Flexbox を使用 */
+  justify-content: center; /* テキストを水平方向に中央揃え */
+  align-items: center; /* テキストを垂直方向に中央揃え */
+}
+
+.button {
+  text-decoration: none;
+  color: white;
+  padding: 15px; /* リンクのパディングを追加 */
+}
+
+.alert {
+  color: red;
+}

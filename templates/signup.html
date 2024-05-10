@@ -1,5 +1,23 @@
-{% extends "base.html" %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> 野球成績管理-バセバル</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+</head>
+<body>
+<h1>野球成績管理アプリ バセバル</h1>
+<nav>
+<ul>
+    <li><a class="button" href="/players">選手</a></li>
+    <li><a class="button" href="/match">試合</a></li>
+    <li><a class="button" href="/register">打席</a></li>
+    <li><a class="button" href="/result">成績</a></li>
+    <li><a class="button" href="/see">履歴</a></li>
+</ul>
+</nav>
 <h2>新規登録</h2>
 <form method="POST">
     <label for="">ユーザー名</label>
@@ -9,4 +27,5 @@
     <p class="alert"><strong>※ユーザー名とパスワードは必ず控えてください。</strong></p>
     <p><input type="submit" value="新規登録"></p>
 </form> 
-{% endblock %}
+</body>
+</html>

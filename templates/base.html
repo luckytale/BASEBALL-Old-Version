@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title> 野球成績管理-バセバル</title>
     <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
 </head>
 <body>
+<h1>野球成績管理アプリ バセバル</h1>
 <nav>
 <ul>
     <li><a class="button" href="/players">選手</a></li>
@@ -19,5 +20,6 @@
 </nav>
 {% block content %}
 {% endblock %}
+<p><a href="/logout" role="button">ログアウト</a></p>
 </body>
 </html>

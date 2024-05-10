@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from itertools import groupby
 from operator import itemgetter
+from waitress import serve
 import os
 import json
 
@@ -418,3 +419,9 @@ def match_update(id):
 @login_manager.unauthorized_handler
 def unauthorized_callback():
     return redirect('/login')
+
+if __name__ == "__main__":
+    app.debug = True
+    serve(app, host='localhost', port=8888)
+    #app.run('0.0.0.0',port=5000)
+    # serve(app, host='0.0.0.0', port=8000)

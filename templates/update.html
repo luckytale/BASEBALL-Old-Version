@@ -13,15 +13,11 @@
     <label for="matchnumber">試合番号</label>
     <input type="text" name="matchnumber" id="matchnumber" size="3" value="{{bat.matchnumber}}"><br>
     <div class="selectedButtonNumber"></div>
-    <label for="team">チーム</label>
-    <input type="text" id="team" name="BatterTeam" size="10" value="{{bat.BatterTeam}}"><br>
     <label for="playerName">打者</label>
     <input type="text" id="playerName" name="BatterName" size="10" value="{{bat.BatterName}}" required><br>            
     投手
     <label><input type="radio" name="hand" value="右投"{% if bat.hand == "右投" %}checked{% endif %}> 右投</label>
     <label><input type="radio" name="hand" value="左投"{% if bat.hand == "左投" %}checked{% endif %}> 左投</label><br>
-    <label for="">球速</label>
-    <input type="text" name="speed" size="5" value="{{bat.speed}}">km/h<br>
     球種
     <select id="type-filter" name="PitchType">           
         <option></option>
@@ -58,7 +54,7 @@
         <option value="犠飛"{% if bat.Result == "犠飛" %} selected{% endif %}>犠飛</option>
         <option value="失"{% if bat.Result == "失" %} selected{% endif %}>エラー</option>
         <option value="打撃妨害"{% if bat.Result == "打撃妨害" %} selected{% endif %}>打撃妨害</option>
-        <option value="走塁妨害"{% if bat.Result == "走塁妨害" %} selected{% endif %}>走塁妨害</option>
+        <option value="守備妨害"{% if bat.Result == "守備妨害" %} selected{% endif %}>守備妨害</option>
     </select><br>
     打点
         <select name="RBI">

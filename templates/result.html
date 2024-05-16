@@ -235,7 +235,7 @@
         if (filteredData.length > 0) {
             // 統計情報の計算
             var hitTypes = ['安打', '二塁打', '三塁打', '本塁打'];
-            var excludeTypes = ['四球','死球','犠打','犠飛']
+            var excludeTypes = ['四球','死球','犠打','犠飛','打撃妨害']
             var hits = filteredData.filter(stat => hitTypes.includes(stat.Result)).length;
             var doubles = filteredData.filter(stat => stat.Result === '二塁打').length;
             var triples = filteredData.filter(stat => stat.Result === '三塁打').length;
@@ -280,14 +280,14 @@
             var hits18 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 18).length;
             var hits19 = filteredData.filter(stat => hitTypes.includes(stat.Result) && stat.course == 19).length;
             var atBats7 = filteredData.filter(stat => stat.course == 7).length - exclude7;
-            var atBats8 = filteredData.filter(stat => stat.course == 8).length - exclude7;
-            var atBats9 = filteredData.filter(stat => stat.course == 9).length - exclude7;
-            var atBats12 = filteredData.filter(stat => stat.course == 12).length - exclude7;
-            var atBats13 = filteredData.filter(stat => stat.course == 13).length - exclude7;
-            var atBats14 = filteredData.filter(stat => stat.course == 14).length - exclude7;
-            var atBats17 = filteredData.filter(stat => stat.course == 17).length - exclude7;
-            var atBats18 = filteredData.filter(stat => stat.course == 18).length - exclude7;
-            var atBats19 = filteredData.filter(stat => stat.course == 19).length - exclude7;
+            var atBats8 = filteredData.filter(stat => stat.course == 8).length - exclude8;
+            var atBats9 = filteredData.filter(stat => stat.course == 9).length - exclude9;
+            var atBats12 = filteredData.filter(stat => stat.course == 12).length - exclude12;
+            var atBats13 = filteredData.filter(stat => stat.course == 13).length - exclude13;
+            var atBats14 = filteredData.filter(stat => stat.course == 14).length - exclude14;
+            var atBats17 = filteredData.filter(stat => stat.course == 17).length - exclude17;
+            var atBats18 = filteredData.filter(stat => stat.course == 18).length - exclude18;
+            var atBats19 = filteredData.filter(stat => stat.course == 19).length - exclude19;
 
             var battingAverage7 = atBats7 > 0 ? (hits7 / atBats7).toFixed(3) : "-";
             var battingAverage7 = battingAverage7 === "1.000" ? "1.000" : battingAverage7.startsWith("1.") ? battingAverage7 : battingAverage7.substring(1);

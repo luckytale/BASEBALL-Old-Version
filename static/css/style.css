@@ -83,8 +83,8 @@
   
 .marker {
     position: absolute;
-    width: 15px; /* 円のサイズ */
-    height: 15px; /* 円のサイズ */
+    width: 20px; /* 円のサイズ */
+    height: 20px; /* 円のサイズ */
     background-color: red; /* 円の色 */
     border-radius: 50%; /* 円形にする */
     transform: translate(-50%, -50%); /* 円の中心をクリックした位置に合わせる */
@@ -96,6 +96,9 @@
   height: 80px; /* 高さ */
   border: 2px solid #000000; /* 枠線 */
   display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center; /* テキストの中央揃え */
 }
 
 .aaaaa {

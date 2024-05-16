@@ -153,15 +153,15 @@ def player_delete(id):
 @login_required
 def register():
     default_match_number = session.get('matchnumber', '1')
-
+    default_hand = session.get('hand', '右投')
     if request.method == 'GET':
         bats = Bat.query.all()
-        return render_template('register.html', bats=bats, default_match_number=default_match_number)
+        return render_template('register.html', bats=bats, default_match_number=default_match_number, default_hand=default_hand)
 
     if request.method == "POST":
         user_id= request.form.get('user_id')
         BatterName= request.form.get('BatterName')
-        hand= request.form.get('hand')
+        hand= request.form.get('hand', default_hand)
         PitchType= request.form.get('PitchType')
         Result= request.form.get('Result')
         course= request.form.get('course')
@@ -184,6 +184,7 @@ def register():
         db.session.add(bat)
         db.session.commit()
 
+        session['hand'] = hand
         session['matchnumber'] = matchnumber
 
         return redirect('/register')
@@ -423,5 +424,5 @@ def unauthorized_callback():
 if __name__ == "__main__":
     app.debug = True
     serve(app, host='localhost', port=8888)
-    #app.run('0.0.0.0',port=5000)
+    # app.run('0.0.0.0',port=5000)
     # serve(app, host='0.0.0.0', port=8000)

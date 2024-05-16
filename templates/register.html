@@ -45,8 +45,8 @@
             <label for="playerName">打者</label>
             <input type="text" id="playerName" name="BatterName" size="10" required><br>            
             投手
-            <label><input type="radio" name="hand" value="右投" checked> 右投</label>
-            <label><input type="radio" name="hand" value="左投"> 左投</label><br>
+            <label><input type="radio" name="hand" value="右投" {% if default_hand == "右投" %}checked{% endif %}> 右投</label>
+            <label><input type="radio" name="hand" value="左投" {% if default_hand == "左投" %}checked{% endif %}> 左投</label><br>
             球種
             <select id="type-filter" name="PitchType">           
                 <option></option>
@@ -79,11 +79,11 @@
                 <option>二塁打</option>
                 <option>三塁打</option>
                 <option>本塁打</option>
-                <option>犠打</option>
-                <option>犠飛</option>
+                <option value="犠打">犠打</option>
+                <option value="犠飛">犠飛</option>
                 <option value="失">エラー</option>
                 <option>打撃妨害</option>
-                <option>走塁妨害</option>
+                <option>守備妨害</option>
             </select><br>
             打点
             <select name="RBI">

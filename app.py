@@ -118,14 +118,14 @@ def index():
 @login_required
 def see():
     if request.method == 'GET':
-        bats = Bat.query.all()
+        bats = Bat.query.filter_by(user_id=current_user.id).all()
         return render_template("see.html", bats=bats)
 
 @app.route("/players", methods=['GET', 'POST'])
 @login_required
 def players():
     if request.method == "GET":
-        players = Players.query.all()
+        players = Players.query.filter_by(user_id=current_user.id).all()
         return render_template('players.html', players=players)  
       
     if request.method == "POST":
@@ -155,7 +155,7 @@ def register():
     default_match_number = session.get('matchnumber', '1')
     default_hand = session.get('hand', '右投')
     if request.method == 'GET':
-        bats = Bat.query.all()
+        bats = Bat.query.filter_by(user_id=current_user.id).all()
         return render_template('register.html', bats=bats, default_match_number=default_match_number, default_hand=default_hand)
 
     if request.method == "POST":
@@ -198,28 +198,29 @@ def fetch_query_results():
     query_results = db.session.query(Bat, Match) \
         .join(Match, Bat.matchnumber == Match.match_number) \
         .order_by(asc(Bat.matchnumber)) \
+        .filter_by(user_id=current_user.id) \
         .all()
     return query_results
 
 @app.route("/result")
 @login_required
 def result():
-    bats = db.session.query(Bat.x, Bat.y).all()    # bats_dataを適切なデータに置き換えてください
+    bats = db.session.query(Bat.x, Bat.y).filter_by(user_id=current_user.id).all()    # bats_dataを適切なデータに置き換えてください
     bats_xy_list = [[bat.x, bat.y] for bat in bats]
     bats_json = json.dumps(bats_xy_list)
-    players = Bat.query.with_entities(Bat.BatterName).distinct().all()
+    players = Bat.query.filter_by(user_id=current_user.id).with_entities(Bat.BatterName).distinct().all()
 
-    matchCount = Bat.query.count()
-    hitCount = (Bat.query.filter(or_(Bat.Result == '安打', Bat.Result == '二塁打', Bat.Result == '三塁打', Bat.Result == '本塁打')).count())
-    doubleCount  = (Bat.query.filter(Bat.Result == '二塁打').count())
-    tripleCount  = (Bat.query.filter(Bat.Result == '三塁打').count())
-    homerunCount  = (Bat.query.filter(Bat.Result == '本塁打').count())
-    ballsCount  = (Bat.query.filter(Bat.Result == '四球').count())
-    deadCount  = (Bat.query.filter(Bat.Result == '死球').count())
-    bantCount  = (Bat.query.filter(Bat.Result == '犠打').count())
-    sacrificeCount  = (Bat.query.filter(Bat.Result == '犠飛').count())
-    interferenceCount  = (Bat.query.filter(Bat.Result == '打撃妨害').count())
-    batsCount  = (Bat.query.filter(Bat.Result != '').count())
+    matchCount = Bat.query.filter_by(user_id=current_user.id).count()
+    hitCount = (Bat.query.filter_by(user_id=current_user.id).filter(or_(Bat.Result == '安打', Bat.Result == '二塁打', Bat.Result == '三塁打', Bat.Result == '本塁打')).count())
+    doubleCount  = (Bat.query.filter_by(user_id=current_user.id).filter(Bat.Result == '二塁打').count())
+    tripleCount  = (Bat.query.filter_by(user_id=current_user.id).filter(Bat.Result == '三塁打').count())
+    homerunCount  = (Bat.query.filter_by(user_id=current_user.id).filter(Bat.Result == '本塁打').count())
+    ballsCount  = (Bat.query.filter_by(user_id=current_user.id).filter(Bat.Result == '四球').count())
+    deadCount  = (Bat.query.filter_by(user_id=current_user.id).filter(Bat.Result == '死球').count())
+    bantCount  = (Bat.query.filter_by(user_id=current_user.id).filter(Bat.Result == '犠打').count())
+    sacrificeCount  = (Bat.query.filter_by(user_id=current_user.id).filter(Bat.Result == '犠飛').count())
+    interferenceCount  = (Bat.query.filter_by(user_id=current_user.id).filter(Bat.Result == '打撃妨害').count())
+    batsCount  = (Bat.query.filter_by(user_id=current_user.id).filter(Bat.Result != '').count())
     
     strokeCount  = batsCount - ballsCount - deadCount - bantCount - sacrificeCount - interferenceCount
     NumberOfBaseHit = (hitCount - doubleCount - tripleCount - homerunCount) + doubleCount*2 + tripleCount*3 + homerunCount*4
@@ -233,8 +234,8 @@ def result():
         OnBasePercentage = 0
         SluggingPercentage = 0
         OPS = 0
-    matches = Match.query.all()
-    bat_records = Bat.query.all()
+    matches = Match.query.filter_by(user_id=current_user.id).all()
+    bat_records = Bat.query.filter_by(user_id=current_user.id).all()
 
     query_results = fetch_query_results()
     sorted_results = sorted(query_results, key=lambda x: (x[1].date, x[1].opponent), reverse=True)
@@ -366,7 +367,7 @@ def update(id):
 @login_required
 def match():
     if request.method == 'GET':
-        matches = Match.query.order_by(Match.id.desc()).all()
+        matches = Match.query.filter_by(user_id=current_user.id).order_by(Match.id.desc()).all()
         return render_template("match.html", matches=matches)
     if request.method == "POST":
         id= request.form.get('id')
@@ -385,7 +386,7 @@ def match():
         db.session.add(match)
         db.session.commit()
 
-        matches = Match.query.order_by(Match.id.desc()).all()
+        matches = Match.query.filter_by(user_id=current_user.id).order_by(Match.id.desc()).all()
 
         return render_template('match.html', matches=matches)
     else:

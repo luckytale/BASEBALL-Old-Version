@@ -423,7 +423,7 @@ def unauthorized_callback():
     return redirect('/login')
 
 if __name__ == "__main__":
-    app.debug = True
-    serve(app, host='localhost', port=8888)
-    # app.run('0.0.0.0',port=5000)
+    # app.debug = True
+    # serve(app, host='localhost', port=8888)
+    app.run('0.0.0.0',port=5000)
     # serve(app, host='0.0.0.0', port=8000)

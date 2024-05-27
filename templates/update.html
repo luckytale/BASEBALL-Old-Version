@@ -64,14 +64,77 @@
             <option value="3"{% if bat.RBI == 3 %} selected{% endif %}>3</option>
             <option value="4"{% if bat.RBI == 4 %} selected{% endif %}>4</option>
         </select><br>
+    打球方向<br>
+    <div id="image-container">
+        <img src="{{url_for('static', filename='images/ground.jpg')}}" alt="野球グラウンド" width="350" height="335">
+        <div id="marker" class="marker"></div>
+    </div>
+
     <!-- フォーム内 -->
     <input type="hidden" name="user_id" value="{{bat.user_id}}">
     <input type="hidden" name="course" value="{{bat.course}}">
-    <input type="hidden" name="x" value="{{bat.x}}">
-    <input type="hidden" name="y" value="{{bat.y}}">
+    <input type="hidden" id="x" name="x" value="{{ bat.x }}">
+    <input type="hidden" id="y" name="y" value="{{ bat.y }}"><br>
     <p>
     <button class="BattingResult" type="submit">決定</button>
     </p>
 </form>
+<script>
+    function updateMarker() {
+    var x = parseFloat(document.getElementById('x').value);
+    var y = parseFloat(document.getElementById('y').value);
+    var marker = document.getElementById('marker');
+    if (!isNaN(x) && !isNaN(y)) {
+        marker.style.left = x + 'px';
+        marker.style.top = y + 'px';
+        } else {
+    marker.style.display = 'none'; // xとyが空の場合はマーカーを非表示にする
+    }}
+    // 初期位置の設定
+    document.addEventListener('DOMContentLoaded', function() {
+        updateMarker();
+    });    
+    document.getElementById('x').addEventListener('input', updateMarker);
+    document.getElementById('y').addEventListener('input', updateMarker);
+
+    var imageContainer = document.getElementById('image-container');
+    // 画像コンテナがクリックされた時
+    imageContainer.addEventListener('click', function(event) {
+        // クリックされた要素がマーカーである場合、それを削除
+        if (event.target.classList.contains('marker')) {
+            event.target.remove();
+            document.getElementById('x').value = '';
+            document.getElementById('y').value = '';            
+            return; // ここで処理を終了
+        }
+
+        // クリックされた位置を取得（画像コンテナ内の相対座標）
+        const x = event.offsetX;
+        const y = event.offsetY;
+
+        // クリックされた位置を隠れたフォームフィールドに設定
+        document.querySelector('input[name="x"]').value = x;
+        document.querySelector('input[name="y"]').value = y;        
+            createMarker(x, y);
+        });
+
+    // マーカーを作成し、画像コンテナに追加する関数
+    function createMarker(x, y) {
+        // 既存のマーカーを取得して削除する
+        const existingMarker = document.querySelector('.marker');
+        if (existingMarker) {
+            existingMarker.parentNode.removeChild(existingMarker);
+        }
+
+        // 新しいマーカーを作成
+        const marker = document.createElement('div');
+        marker.classList.add('marker');
+        marker.style.left = `${x}px`;
+        marker.style.top = `${y}px`;
+
+        // マーカーを画像コンテナに追加
+        imageContainer.appendChild(marker);
+    }
+</script>
 </body>
 </html>

@@ -177,3 +177,12 @@ li {
 .alert {
   color: red;
 }
+
+#marker {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}

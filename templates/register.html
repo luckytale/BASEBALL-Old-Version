@@ -99,9 +99,9 @@
             </div>
             <!-- フォーム内 -->
             <input type="hidden" name="course" value="">
-            <input type="hidden" name="x" value="">
-            <input type="hidden" name="y" value="">
-            <button class="BattingResult" type="submit">決定</button>
+            <input type="hidden" id="x" name="x" value="">
+            <input type="hidden" id="y" name="y" value=""><br>
+                    <button class="BattingResult" type="submit">決定</button>
         </form>
     </div>
 </div>
@@ -126,13 +126,15 @@
     });
 
     // 打球方向
-    const imageContainer = document.getElementById('image-container');
+    var imageContainer = document.getElementById('image-container');
 
     // 画像コンテナがクリックされた時
     imageContainer.addEventListener('click', function(event) {
         // クリックされた要素がマーカーである場合、それを削除
         if (event.target.classList.contains('marker')) {
             event.target.remove();
+            document.getElementById('x').value = '';
+            document.getElementById('y').value = '';            
             return; // ここで処理を終了
         }
 
@@ -148,6 +150,13 @@
 
     // マーカーを作成し、画像コンテナに追加する関数
     function createMarker(x, y) {
+        // 既存のマーカーを取得して削除する
+        const existingMarker = document.querySelector('.marker');
+        if (existingMarker) {
+            existingMarker.parentNode.removeChild(existingMarker);
+        }
+
+        // 新しいマーカーを作成
         const marker = document.createElement('div');
         marker.classList.add('marker');
         marker.style.left = `${x}px`;
@@ -156,7 +165,7 @@
         // マーカーを画像コンテナに追加
         imageContainer.appendChild(marker);
     }
-
+        
     // playerDataの取得
     fetch("/api/players")
         .then(response => response.json())

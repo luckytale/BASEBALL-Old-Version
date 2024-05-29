@@ -1,26 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>選手登録</h2>
+<img src="{{url_for('static', filename='images/player.png')}}" alt="選手" ><br>
 背番号と名前を登録してください。<br>
 ※背番号が重複していると正しく記録できない可能性があります。
 
 <h2>試合登録</h2>
+<img src="{{url_for('static', filename='images/match.png')}}" alt="試合" ><br>
 試合番号、日付、対戦相手を登録してください。<br>
 ※試合番号が重複していると正しく記録できない可能性があります。
 
 <h2>打席登録</h2>
 1.打ったコースを選択してください。<br>
-2.試合番号、背番号、打者名、投手、球種、結果を入力してください。<br>
-背番号を入力すると自動で打者名が入力されます。<br>
-3.打球が飛んだ場所を選択してください<br>
-三振や四球の場合は打球方向を選択する必要はありません。<br>
-4.決定
+<img src="{{url_for('static', filename='images/course.png')}}" alt="コース" ><br>
+2.試合番号、背番号、打者名、投手、球種、結果、打球方向を入力してください。<br>
+※背番号を入力すると自動で打者名が入力されます。<br>
+※三振や四球の場合は打球方向を選択する必要はありません。<br><br>
+<img src="{{url_for('static', filename='images/register.png')}}" alt="試合" ><br><br>
+3.決定を押して打席を登録してください。
 
 <h2>成績閲覧</h2>
 プルダウンから選手名を選択してください。<br>
 投手（右投、左投）、球種ごとの成績も閲覧できます。<br>
-打球方向は安打とアウトを選択可能です。
+打球方向は安打とアウトを選択可能です。<br><br>
+<img src="{{url_for('static', filename='images/result.png')}}" alt="打率" ><br>
   
 <h2>履歴</h2>
 打席結果の閲覧、編集、削除が可能です。<br>
-※間違って削除しないよう注意してください。{% endblock %}
+※間違って削除しないよう注意してください。<br>
+<img src="{{url_for('static', filename='images/see.png')}}" alt="打率" ><br>
+{% endblock %}

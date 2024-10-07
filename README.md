@@ -1,3 +1,11 @@
+<h2>※注意</h2>
+<div>
+今春に開発したアップデート前のプロダクトです。</br>
+<p>最新版は下記になります。</br>
+https://d1apesv75o7p9c.cloudfront.net
+</p>
+</div>
+
 <h2>ログイン</h2>
 <p>https://baseball-player-analysis.com/login</p>
 <p>ユーザー名：sample<br>

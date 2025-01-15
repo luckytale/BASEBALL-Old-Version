@@ -4,6 +4,7 @@
 
 
 <h2>ログイン</h2>
+※※URLは廃止しました※※
 <p>https://baseball-player-analysis.com/login</p>
 <p>ユーザー名：sample<br>
 パスワード：sample</p>
